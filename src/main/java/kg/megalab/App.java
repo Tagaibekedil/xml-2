@@ -2,10 +2,13 @@ package kg.megalab;
 
 import kg.megalab.config.properties.UrlClass;
 import kg.megalab.model.GeoPlugins;
+import kg.megalab.test.JsonMapper;
 import kg.megalab.test.RestService;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
+import javax.xml.bind.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,6 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+ import org.w3c.dom.Element;
 
 
 /**
@@ -27,11 +31,14 @@ import java.util.List;
  * И прикрепить ссылку на github
  */
 public class App {
-    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
-        UrlClass u = new UrlClass();
+    public static void main(String[] args) throws JAXBException, IOException, SAXException, ParserConfigurationException {
+        UrlClass u=new UrlClass();
         RestService restService = new RestService();
         FileWriter fw = new FileWriter("file.txt");
+        System.out.println(fw);
         String sb = restService.getRest(u.getUrl());
+        JsonMapper jsonMapper=new JsonMapper();
+        System.out.println(jsonMapper.gentGeo(restService.getRest(u.getUrl())));
         for (int i = 0; i < sb.length(); i++) {
             fw.write(sb.charAt(i));
         }
@@ -45,7 +52,7 @@ public class App {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) node;
+                Element element=(Element)node;
                 String request = element.getElementsByTagName("geoplugin_request").item(0).getChildNodes().item(0).getNodeValue();
                 int status = Integer.parseInt(element.getElementsByTagName("geoplugin_status").item(0).getTextContent());
                 String delay = element.getElementsByTagName("geoplugin_delay").item(0).getTextContent();
@@ -73,8 +80,5 @@ public class App {
             }
         }
         System.out.println(List);
-
-
     }
 }
-
